@@ -35,8 +35,14 @@ export function AuthProvider({ children }) {
     const fetchUser = async () => {
       if (token) {
         try {
-          const res = await api.get("/me");
+          const res = await api.get("/me", {
+          headers: {
+          Authorization: `Bearer ${token}`,
+           },
+        });
+         
           setUser(res.data);
+          
         } catch {
           logout();
         }

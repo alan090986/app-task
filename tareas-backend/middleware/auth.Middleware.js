@@ -1,26 +1,36 @@
-import jwt from 'jsonwebtoken';
-import { pool } from '../db.js';
+import db from "../config/db.js";
+import jwt from "jsonwebtoken";
 
-export const protegerRuta = async (req, res, next) => {
-  const auth = req.headers.authorization;
+export const authMiddleware = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No autorizado' });
+  if (!authHeader) {
+    return res.status(401).json({ message: "Token no proporcionado" });
   }
 
-  const token = auth.split(' ')[1];
+  const token = authHeader.split(" ")[1];
 
   try {
+   
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const [result] = await pool.query('SELECT * FROM users WHERE id = ?', [decoded.id]);
+    console.log("Decoded JWT:", decoded);
+    req.userId = decoded.id;
 
-    if (result.length === 0) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
+    const [rows] = await db.query(
+      "SELECT id FROM users WHERE id = ?",
+      [req.userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(401).json({ message: "Usuario no válido" });
     }
 
-    req.usuario = result[0];
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token inválido' });
+    return res.status(401).json({ message: "Token inválido" });
   }
 };
+
+
+
+

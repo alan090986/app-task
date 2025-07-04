@@ -1,19 +1,27 @@
-import { useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const { login } = useContext(AuthContext);
+  const { login, isAuthenticated } = useContext(AuthContext); // asegúrate que AuthContext exporte isAuthenticated
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  
+
+  // Redirige automáticamente si ya está logueado
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/tasks"); // redirige a la pantalla principal
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = async ({ email, password }) => {
     try {
       await login(email, password);
-      navigate("/"); // Redirige al Home o Dashboard
+      navigate("/tasks"); // usa la RUTA que tengas definida en tu router
     } catch {
       setErrorMessage("Usuario o contraseña incorrectos");
     }
@@ -33,6 +41,7 @@ export default function Login() {
             {...register("email", { required: "Email requerido" })}
             className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
             placeholder="Email"
+            autoComplete="email"
             type="email"
           />
           {errors.email && (
@@ -43,6 +52,7 @@ export default function Login() {
             {...register("password", { required: "Contraseña requerida" })}
             className="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
             placeholder="Contraseña"
+            autoComplete="current-password"
             type="password"
           />
           {errors.password && (
@@ -56,13 +66,13 @@ export default function Login() {
           <button className="w-full bg-blue-600 text-white rounded p-3 mt-2 hover:bg-blue-700">
             Entrar
           </button>
+
           <p className="text-center mt-4">
             ¿No tienes cuenta?{" "}
             <a href="/register" className="text-blue-600 hover:underline">
-               Regístrate aquí
-             </a>
-            </p>
-
+              Regístrate aquí
+            </a>
+          </p>
         </form>
       </motion.div>
     </div>

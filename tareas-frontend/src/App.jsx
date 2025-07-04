@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Tareas from "./pages/task";
+import Task from "./pages/task";
 import Loading from "./pages/Loading";
 import NotFound from "./pages/NotFound";
 import { PrivateRoute } from "./components/PrivateRoute";
@@ -26,16 +26,18 @@ function AppContent({ theme }) {
         {/* Públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/tasks" element={<Task />} />
 
         {/* Privadas */}
         <Route
           path="/"
           element={
-            <PrivateRoute>
-              <Tareas />
-            </PrivateRoute>
-          }
-        />
+          <PrivateRoute>
+        <Task />
+        </PrivateRoute>
+  }
+/>
+
 
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
